@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Books Home Page</title>
+</head>
+<body>
+    
+    <h1>Welcome {{user.first_name}} {{user.last_name}}</h1>
+    <a href="/logout">Log Out!</a>
+
+    <h3>Add a Favorite Book:</h3>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{message.tags}}" {% endif %}>{{message}}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <form action="add_books" method="POST">
+        {% csrf_token %}
+        <p>Title:</p>
+        <input type="text" name="title" placeholder="Enter title here">
+        <p>Description</p>
+        <textarea name="description" placeholder="Enter description here" cols="30" rows="10"></textarea>
+        <input type="submit" value="Add!">
+    </form>
+
+    <div>
+        <h3>All Books:</h3>
+
+        {% for display_book in all_books %}
+            <a href="{{display_book.id}}">{{display_book.title}}</a>
+            <p>(added by {{display_book.uploaded_by.first_name}} {{display_book.uploaded_by.last_name}})</p>
+
+            {% comment %}HTML's way of commenting doesn't necessarily work the same as django's 
+            If user not in the likes, then we cant like it again
+            {% endcomment %}
+
+            {% if user not in display_book.users_who_like.all %} 
+                <a href="/books/favorite/{{display_book.id}}">Favorite</a>
+                {% else %}
+                <p>This is one of your favorites!</p>
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+</body>
+</html>

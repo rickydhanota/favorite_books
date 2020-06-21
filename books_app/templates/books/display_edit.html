@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display and Edit Books</title>
+</head>
+<body>
+
+    <h1>Welcome, {{user.first_name}} {{user.last_name}}</h1>
+    <a href="/logout">Log Out!</a>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{message.tags}}" {% endif %}>{{message}}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if book.uploaded_by == user %}
+
+    <form action="editandsave/{{book.id}}" method="POST">
+        {% csrf_token %}
+        <textarea name="title">{{book.title}}</textarea>
+        <p>Added By: {{book.uploaded_by.first_name}} {{book.uploaded_by.last_name}}</p>
+        <p>Added On: {{book.created_at}}</p>
+        <p>Last Updated On: {{book.updated_at}}</p>
+        <textarea name="description" cols="30" rows="10">{{book.description}}</textarea>
+        <input type="submit" value="Update">
+    </form>
+    
+    <form action="delete/{{book.id}}">
+        {% csrf_token %}
+        <input type="submit" value="Delete">
+    </form>
+
+    {% else %}
+
+    <form action="/books/" method="POST">
+        {% csrf_token %}
+        <h3>{{book.title}}</h3>
+        <p>Added By: {{book.uploaded_by.first_name}} {{book.uploaded_by.last_name}}</p>
+        <p>Added On: {{book.created_at}}</p>
+        <p>Last Updated On: {{book.updated_at}}</p>
+        <p>{{book.description}}</p>
+        <input type="submit" value="Return Home">
+    </form>
+
+    {% endif %}
+
+    <h3>Users who have liked</h3>
+    {% for users in book.users_who_like.all %}
+        <p>{{users.first_name}} {{users.last_name}}</p>
+        {% if users == user %}
+        <a href="/books/unfavorite/{{book.id}}">Un-Favorite</a>
+        {% endif %}
+    {% endfor %}
+</body>
+</html>
